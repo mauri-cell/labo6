@@ -56,6 +56,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from pathlib import Path
 from tqdm import tqdm
+from matplotlib.ticker import FuncFormatter
+
 
 #%%Ver imagen
 
@@ -203,10 +205,21 @@ for k, archivo in enumerate(archivos):
 
 #%%Recortar en torno al máximo (roi)
 
-img = iio.imread("/Users/Mauri/Downloads/con_telescopio.tiff").astype(float)
+
+img = iio.imread("/Users/Mauri/Downloads/aumentocon200mmy30mm.tiff").astype(float)
+
+half_size = 700
+
+pixel_size = 1 # = 1 si querés la distancia en mm
+if pixel_size == 1:
+    pixel_size = 5.86e-3#mm
+    pixel_flag = 1
+else:
+    pixel_size = 1
+
 
 # recortar ROI centrada en el máximo
-roi, (x1, x2, y1, y2), (xmax, ymax) = crop_roi_centered_on_max(img, half_size=500)
+roi, (x1, x2, y1, y2), (xmax, ymax) = crop_roi_centered_on_max(img, half_size=half_size)
 
 ny, nx = roi.shape
 x = np.arange(nx)
@@ -242,31 +255,6 @@ popt, pcov = curve_fit(
 
 A_fit, x0_fit, y0_fit, sigma_x_fit, sigma_y_fit, theta_fit, C_fit = popt
 
-
-
-# plt.figure()
-# plt.pcolormesh(X, Y, roi, shading="auto", cmap="inferno")
-# plt.colorbar(label="Intensidad")
-# plt.xlabel("x [px]")
-# plt.ylabel("y [px]")
-# plt.show()
-
-# print("==== Ajuste ROI ====")
-# print(f"A = {A_fit:.2f}")
-# print(f"x0 ={x0_fit:.2f}")
-# print(f"y0 = {y0_fit:.2f}", )
-# print(f"sigma_x = {sigma_x_fit:.2f}")
-# print(f"sigma_y = {sigma_y_fit:.2f}")
-# print(f"theta = {theta_fit:.2f}")
-# print(f"C = {C_fit:.2f}")
-
-
-# # posición del centro en coordenadas de la imagen original
-# x0_global = x1 + x0_fit
-# y0_global = y1 + y0_fit
-
-# print("Centro global (x,y) =", x0_global, y0_global)
-# Figura con grilla: arriba perfil_x, centro imagen, derecha perfil_y
 
 perfil_x = roi.mean(axis=0)
 perfil_y = roi.mean(axis=1)
@@ -319,6 +307,19 @@ ax_cbar.yaxis.set_label_position("left")
 ax_cbar.yaxis.set_ticks_position("left")
 
 
+if pixel_flag == 1:
+    # Convertir automáticamente px -> mm en los ejes
+    ax_img.xaxis.set_major_formatter(
+        FuncFormatter(lambda x, pos: f"{x * pixel_size:.1f}")
+    )
+    
+    ax_img.yaxis.set_major_formatter(
+        FuncFormatter(lambda y, pos: f"{y * pixel_size:.1f}")
+    )
+    
+    ax_img.set_xlabel("x [mm]")
+    ax_img.set_ylabel("y [mm]")
+    
 plt.show()
 
 
@@ -337,8 +338,8 @@ sigma_y_mm = sigma_y_fit * pixel_size_mm
 fwhm_x_mm = 2.355 * sigma_x_mm
 fwhm_y_mm = 2.355 * sigma_y_mm
 
-d_1e2_x = 2 * np.sqrt(2) * sigma_x_mm
-d_1e2_y = 2 * np.sqrt(2) * sigma_y_mm
+d_1e2_x = 4 * sigma_x_mm
+d_1e2_y = 4 * sigma_y_mm
 
 
 print(f"sigma_x_mm = ({sigma_x_mm:.2f} ", "mm")
