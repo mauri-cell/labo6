@@ -354,18 +354,33 @@ pixel_size = 5.86e-3  # mm por pixel (si corresponde)
 
 plt.figure(figsize=(6,4))
 
-plt.plot((x_perfil_hat - xc_hat)* pixel_size, I_x_hat, color="grey", label = "Perfil luego del PiShaper")
-#plt.plot((x_perfil_gauss - xc_gauss)* pixel_size, I_x_gauss, color="darkcyan)
+plt.plot((x_perfil_hat - xc_hat)* pixel_size, I_x_hat, color="darkviolet", label = "Perfil luego del PiShaper")
+plt.plot((x_perfil_gauss - xc_gauss)* pixel_size, I_x_gauss, color="darkcyan", alpha = 0.5, label = "Perfil antes del PiShaper")
 plt.plot((x_fit - xc_gauss)* pixel_size, I_fit, "b-", label="Ajuste del perfil antes del PiShaper")
 
 
 plt.xlabel("x [mm]")
-plt.ylabel("Intensidad")
+plt.ylabel("Intensidad [a.u.]")
 plt.legend(loc='upper right', bbox_to_anchor=(2, 1))
 plt.title("Perfil en X")
 plt.grid(True, alpha = 0.3)
 
 plt.show()
+
+
+#%%
+
+analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/sin_nada_1.tiff",
+                    half_size = 700, mm = True,
+                    x0 = 1000, y0 = 600, centro_imagen = False,
+                    band_halfwidth = 5,
+                    ajuste_gauss = False,
+                    centro_ajuste = False,
+                    graficar_perfiles = False
+                    )
+
+
+
 
 
 
