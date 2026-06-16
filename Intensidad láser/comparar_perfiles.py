@@ -211,7 +211,7 @@ def analizar_perfil(ruta_tiff,
     
     # Colorbar en su propio eje
     cbar = fig.colorbar(im, cax=ax_cbar)
-    cbar.set_label("Intensidad")
+    cbar.set_label("Intensidad [a.u.]")
     ax_cbar.yaxis.set_label_position("left")
     ax_cbar.yaxis.set_ticks_position("left")
     
@@ -269,12 +269,12 @@ def analizar_perfil(ruta_tiff,
 
 
 #%%
-analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/top_hat_0.tiff",
-                    half_size = 700, mm = True,
-                    x0 = 1000, y0 = 600, centro_imagen = False,
-                    band_halfwidth = 5,
-                    ajuste_gauss = True,
-                    centro_ajuste = True,
+analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/Alineación láser en la muestra/TUC-20260616171738857.tif",
+                    half_size = 900, mm = False,
+                    x0 = 1050, y0 = 950, centro_imagen = False,
+                    band_halfwidth = 15,
+                    ajuste_gauss = False,
+                    centro_ajuste = False,
                     graficar_perfiles = True
                     )
 
@@ -305,10 +305,10 @@ analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/top_hat_0.tiff",
 #%%Comparo Perfiles
 
 
-top_hat = analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/top_hat_0.tiff",
-                    half_size = 700, mm = True,
-                    x0 = 1000, y0 = 600, centro_imagen = False,
-                    band_halfwidth = 5,
+top_hat = analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/Alineación láser en la muestra/Con PiShaper/TUC-20260616172622792.tif",
+                    half_size = 900, mm = False,
+                    x0 = 1050, y0 = 950, centro_imagen = False,
+                    band_halfwidth = 15,
                     ajuste_gauss = True,
                     centro_ajuste = True,
                     graficar_perfiles = True
@@ -321,10 +321,10 @@ I_x_hat = top_hat["perfil_x"]["I"]
 xc_hat = top_hat["xc"]
 
 #%%
-gauss = analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/sin_nada_1.tiff",
-                    half_size = 700, mm = True,
-                    x0 = 1000, y0 = 600, centro_imagen = False,
-                    band_halfwidth = 5,
+gauss = analizar_perfil(ruta_tiff = "/Users/Mauri/Downloads/Alineación láser en la muestra/Sin PiShaper/TUC-20260616172533859.tif",
+                    half_size = 900, mm = False,
+                    x0 = 1050, y0 = 950, centro_imagen = False,
+                    band_halfwidth = 30,
                     ajuste_gauss = True,
                     centro_ajuste = True,
                     graficar_perfiles = True
@@ -349,20 +349,21 @@ I_fit = gauss_1d(x_fit, *popt)
 
 
 #%%
-
-pixel_size = 5.86e-3  # mm por pixel (si corresponde)
+M = 59.5
+pixel_size =  6.5e-3 # mm por pixel (si corresponde)
+pixel_size = 6.5 / M #um
 
 plt.figure(figsize=(6,4))
 
-plt.plot((x_perfil_hat - xc_hat)* pixel_size, I_x_hat, color="darkviolet", label = "Perfil luego del PiShaper")
-plt.plot((x_perfil_gauss - xc_gauss)* pixel_size, I_x_gauss, color="darkcyan", alpha = 0.5, label = "Perfil antes del PiShaper")
-plt.plot((x_fit - xc_gauss)* pixel_size, I_fit, "b-", label="Ajuste del perfil antes del PiShaper")
+plt.plot((x_perfil_hat - xc_hat)* pixel_size, I_x_hat, color="darkviolet", label = "Perfil con πShaper")
+plt.plot((x_perfil_gauss - xc_gauss)* pixel_size, I_x_gauss, color="firebrick", alpha = 0.5, label = "Perfil sin πShaper")
+plt.plot((x_fit - xc_gauss)* pixel_size, I_fit, "-", color = "red", label="Ajuste del perfil antes del PiShaper")
 
 
-plt.xlabel("x [mm]")
+plt.xlabel("x [µm]")
 plt.ylabel("Intensidad [a.u.]")
 plt.legend(loc='upper right', bbox_to_anchor=(2, 1))
-plt.title("Perfil en X")
+plt.title("Perfil en x sobre la muestra")
 plt.grid(True, alpha = 0.3)
 
 plt.show()
